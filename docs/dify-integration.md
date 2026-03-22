@@ -91,11 +91,75 @@
 
 ---
 
+## Windows PowerShell 下如何调用（避免误用 `curl`）
+
+在 **Windows PowerShell** 里直接输入 **`curl`**，多数情况下**不是** Linux/macOS 那个 curl，而是 **`Invoke-WebRequest` 的别名**，参数写法不同，容易导致请求失败、中文乱码或与文档示例不一致。
+
+### 做法一：使用真正的 `curl.exe`（推荐与 bash 示例对齐）
+
+系统一般自带 **`C:\Windows\System32\curl.exe`**。在 PowerShell 里请**显式写 `curl.exe`**，不要写 `curl`。
+
+为避免在命令行里转义中文 JSON，可把请求体存成 **UTF-8 文件**再提交：
+
+```powershell
+$env:DIFY_APP_API_KEY = "你的_App_API_Key"   # 建议改为从用户环境变量读取，勿写进仓库
+$base = "https://dify.rez-ti.com/v1"
+$jsonPath = Join-Path $env:TEMP "dify-chat-body.json"
+# 无 BOM 的 UTF-8，减少部分网关对 JSON 的误判（PowerShell 5.1 可用 .NET 写入）
+$payload = '{"query":"介绍一下雷泽智能","user":"windows-user-001","response_mode":"streaming","inputs":{}}'
+[System.IO.File]::WriteAllText($jsonPath, $payload, [System.Text.UTF8Encoding]::new($false))
+
+curl.exe -sS -m 120 -N -X POST "$base/chat-messages" `
+  -H "Authorization: Bearer $env:DIFY_APP_API_KEY" `
+  -H "Content-Type: application/json; charset=utf-8" `
+  --data-binary "@$jsonPath"
+```
+
+流式输出为 **SSE**（多行 `data: {...}`）；若只要快速验证 **blocking** 且你方实例支持，可把 `response_mode` 改为 `blocking` 并去掉 `-N`。
+
+### 做法二：使用 `Invoke-RestMethod`（适合 `blocking`、返回整段 JSON）
+
+```powershell
+$env:DIFY_APP_API_KEY = "你的_App_API_Key"
+$uri = "https://dify.rez-ti.com/v1/chat-messages"
+$bodyObj = [ordered]@{
+  query            = "介绍一下雷泽智能"
+  user             = "windows-user-001"
+  response_mode    = "blocking"
+  inputs           = @{}
+}
+$bodyJson = $bodyObj | ConvertTo-Json -Compress
+
+Invoke-RestMethod -Uri $uri -Method Post `
+  -Headers @{ Authorization = "Bearer $($env:DIFY_APP_API_KEY)" } `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bodyJson
+```
+
+返回值为 **已解析的 PowerShell 对象**，可直接访问 `.answer`、`.conversation_id` 等字段（以实际响应为准）。
+
+### 做法三：安装 [PowerShell 7+](https://github.com/PowerShell/PowerShell)（`pwsh`）
+
+对 UTF-8 与跨平台脚本更友好；用法与上类似，仍建议 **`curl.exe`** 或 **`Invoke-RestMethod`**，**不要依赖 `curl` 别名**。
+
+---
+
 ## 调用失败时：新龙虾该怎么做
 
 1. **打开上文保留的官方链接**（尤其 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)），对照当前 Dify 版本的 OpenAPI（路径、参数、鉴权头是否变更）。  
 2. **检索** [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt) 中与「对话 / Chat / 工作流」相关的最新页面。  
 3. 若官方文档与本文档**明显不一致**或雷泽环境有特殊网关前缀，请到 **[ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)** 提交 **Issue**，说明：期望行为、请求方法路径、HTTP 状态码与脱敏后的错误信息（**勿贴 API Key**），便于人类更新 `dify-integration.md` 或 `manifest`。
+
+---
+
+## 常见问题：「你的问题是：????」与知识库正文乱码
+
+### 1. 用户问题显示成一串 `?`
+
+多见于工作流「直接回复」里写了 **`{{#开始节点id.sys.query#}}`**，在部分 Dify 版本或导入方式下，**变量解析或 UTF-8 传递异常**，界面就显示成 `????`。处理方式：
+
+- 在「直接回复」中改用 **`{{#sys.query#}}`**（高级对话里用户输入的全局变量），与仓库 `dify-knowledgebase/rezclaw.yml` 当前写法一致；或在画布上用**插入变量**选择「开始 / sys.query」让系统自动生成路径。
+- 集成方调用 **`POST /chat-messages`** 时，请求体必须是 **UTF-8** 的 JSON（例如 `{"query":"介绍一下雷泽智能",...}`），HTTP 客户端勿用错误编码或损坏多字节字符。
 
 ---
 

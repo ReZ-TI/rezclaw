@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 12,
-  "updated_at": "2025-03-24T00:00:00Z",
-  "changelog": "README/dify-integration：query 提问参考（如介绍一下雷泽智能）；manifest query_examples 扩充。",
+  "content_revision": 14,
+  "updated_at": "2025-03-24T14:00:00Z",
+  "changelog": "dify-integration：Windows PowerShell 使用 curl.exe / Invoke-RestMethod，避免 curl 别名。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
