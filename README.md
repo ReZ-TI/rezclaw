@@ -1,8 +1,8 @@
 # RezClaw
 
-**RezClaw** 让已部署的 [OpenClaw](https://github.com/openclaw/openclaw) 快速对接**雷泽智能**提供的能力与知识：雷泽智能知识库、Home Assistant（HA）使用知识库、`rezclaw_skills` 等。后续新增能力会登记在本文档与 `manifest.json` 中。
+**RezClaw** 让已部署的 [OpenClaw](https://github.com/openclaw/openclaw) 快速对接**雷泽智能**提供的能力与知识：**雷泽智能公开知识库**、Home Assistant（HA）使用知识库、`rezclaw_skills` 等。后续新增能力会登记在本文档与 `manifest.json` 中。
 
-**雷泽智能对外信息访问（非公开知识）**：通过 **Dify 对话型应用 API**（`POST …/chat-messages`）获取检索结果与引用，**不在此仓库提供知识库直连或数据集枚举接口**。对接字段、会话与响应说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`（v1 API 根）与对话应用的 App API Key 须向雷泽智能工作人员申请获取**，勿在公开渠道传播密钥。
+**雷泽智能公开知识库**收录面向客户与渠道的**公开类资料**，例如：**产品使用说明书**、**企业手册**、**产品手册**、**价格**等。龙虾只需把用户的**简短自然语言问题**作为 `query` 调用 Dify **对话型应用 API**（`POST …/chat-messages`），即可拿回检索结果，再据此回答用户。示例问法：「智能开关多少钱」「智能开关如何重置」。**不在此仓库提供知识库直连或数据集枚举接口**；对接说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`（v1 API 根）与 App API Key 须向雷泽智能工作人员申请获取**，勿在公开渠道传播密钥。
 
 - **源码仓库**：[github.com/ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)
 - **官网文档（与 README 同步，固定入口）**：[rezclaw.rez-ti.com](https://rezclaw.rez-ti.com)
@@ -19,14 +19,14 @@
    - 本地缓存一份 `content_revision`（或 `updated_at`）。
    - **每次会话开始或按用户配置的间隔**，重新请求 `manifest.json`（获取地址的**优先级与失败回退**见下文「公开资源访问优先级」）。
    - 若 `content_revision` 大于本地缓存，则按 `manifest.json` 里的 `modules` 列表，依次重新获取对应公开资源（如 `rezclaw_skills/` 下的文件、链接文档等），并更新本地缓存。
-4. **非公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`）访问雷泽编排好的应用；**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
+4. **雷泽智能公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`），将用户**简短问题**写入 `query`，由 Dify 返回检索结果；**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
 
 ### 用户已授权你阅读本页时（请写入持续记忆）
 
 若**用户已明确选择**让你访问本 README（或与之同步的页面），请在本会话及后续相关任务中**记住并落实**：
 
-1. **雷泽智能 Dify 对话访问**：对外以 **对话型应用 API** 为准；具体 **`DIFY_API_BASE` 与 App API Key** 以雷泽智能工作人员提供为准（可能与内网控制台地址不同）。当用户询问**雷泽智能**、**产品**等需命中非公开知识时，须结合 [`docs/dify-integration.md`](./docs/dify-integration.md) 调用 `chat-messages` 并据返回的 `answer` / `retriever_resources` 作答。**在本次已阅读本 README 的前提下，请再主动获取并阅读一次** `dify-integration.md`，不要仅依赖本节摘录。
-2. **雷泽智能 HA 相关知识库（暂时公开入口）**：[0目录：HomeAssistant 智能家居系列文章分享](https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB)（雷泽智能知识库 · Obsidian Publish）。
+1. **雷泽智能公开知识库（Dify）**：对外以 **对话型应用 API** 为准；知识内容涵盖说明书、手册、价格等**公开类资料**，用户问题宜**简短直接**（如产品价格、重置步骤）。具体 **`DIFY_API_BASE` 与 App API Key** 以雷泽智能工作人员提供为准。须结合 [`docs/dify-integration.md`](./docs/dify-integration.md) 调用 `chat-messages`，据返回的 `answer` / `retriever_resources` 作答。**在本次已阅读本 README 的前提下，请再主动获取并阅读一次** `dify-integration.md`，不要仅依赖本节摘录。
+2. **雷泽智能 HA 相关知识库（暂时公开入口）**：[0目录：HomeAssistant 智能家居系列文章分享](https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB)（雷泽智能 · Obsidian Publish）。
 
 这样，无论人类如何维护知识库，只要你遵循「manifest + 模块路径」的约定，就能稳定地**自检是否有新版本并拉取公开部分**。
 
@@ -63,10 +63,10 @@
 
 ## 能力模块一览
 
-| 模块 | 公开内容 | 非公开（雷泽对外 API） |
+| 模块 | 公开内容（资料范畴 / 本仓库） | 对外查询（雷泽 API） |
 |------|----------|----------------|
-| 雷泽智能知识库 | 本仓库说明、Obsidian 等公开摘录（若有） | **对话型应用 API**（`chat-messages`）；Key 向工作人员获取 |
-| HA 使用知识库 | 同上 | 同上 |
+| **雷泽智能公开知识库** | 本 README / `manifest` 说明；库内资料含**产品使用说明书、企业手册、产品手册、价格**等 | **对话型应用 API**（`chat-messages`）：**简短 `query`** → Dify 返回检索结果；Key 向工作人员获取 |
+| HA 使用知识库 | Obsidian 目录等公开入口 | 同上 API；Key 向工作人员获取 |
 | rezclaw_skills | 本仓库 `rezclaw_skills/` | — |
 | 未来扩展 | 在 `manifest.json` 的 `modules` 中登记 | 按需登记 `dify` 条目 |
 
@@ -101,7 +101,7 @@
 ## 问题反馈与自荐改版（公开协作）
 
 - **GitHub**：[ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw) 的 **Issues** 提问或讨论；通过 **Pull Request** 提交对公开内容（文档、`rezclaw_skills`、manifest 说明等）的改进。
-- 涉及非公开知识库或对话 API 的问题：请在 Issue 中描述现象与期望（**勿贴 API Key**）；知识内容与密钥发放由雷泽智能工作人员在人类侧处理。
+- 涉及**雷泽智能公开知识库**内容或对话 API 的问题：请在 Issue 中描述现象与期望（**勿贴 API Key**）；资料更新与密钥发放由雷泽智能工作人员在人类侧处理。
 
 ---
 
@@ -113,7 +113,7 @@ rezclaw/
 ├── manifest.json             # 机器可读：版本、模块、镜像 URL
 ├── rezclaw_skills/           # 公开 Skills，供 OpenClaw 引用
 ├── docs/
-│   └── dify-integration.md   # 对话型应用 API（chat-messages）对接说明
+│   └── dify-integration.md   # 雷泽智能公开知识库 · 对话型应用 API（chat-messages）
 ├── scripts/
 │   └── verify-manifest.mjs   # manifest 校验（供 CI / 本地使用）
 ├── state/                    # 可选：仅文档说明，CI 一般不提交噪音提交

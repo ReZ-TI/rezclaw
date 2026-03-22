@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 8,
-  "updated_at": "2025-03-23T14:00:00Z",
-  "changelog": "README：雷泽对外信息访问走对话型应用 API；API 根与 App Key 向工作人员获取；manifest 模块说明对齐。",
+  "content_revision": 9,
+  "updated_at": "2025-03-23T16:00:00Z",
+  "changelog": "雷泽智能知识库更名为公开知识库；收录说明书/手册/价格等；简短 query 示例。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -14,9 +14,10 @@
   "modules": [
     {
       "id": "leize_kb",
-      "name": "雷泽智能知识库",
+      "name": "雷泽智能公开知识库",
       "public": {
-        "description": "公开说明见 README；非公开内容通过对话型应用 API（chat-messages）访问，见 docs/dify-integration.md。",
+        "description": "库内为面向客户与渠道的公开类资料：产品使用说明书、企业手册、产品手册、价格等。龙虾将用户简短问题写入 chat-messages 的 query，由 Dify 返回检索结果。",
+        "query_examples": ["智能开关多少钱", "智能开关如何重置"],
         "api_access_note": "DIFY_API_BASE 与 App API Key 由雷泽智能工作人员下发，勿在公开渠道传播。"
       },
       "dify": {
@@ -27,7 +28,7 @@
       "id": "ha_kb",
       "name": "HA 使用知识库",
       "public": {
-        "description": "与雷泽智能知识库相同：公开说明 + 对话型应用 API 访问非公开内容。",
+        "description": "与雷泽智能公开知识库相同：公开说明 + 对话型应用 API（简短 query）检索。",
         "obsidian_publish_entry": "https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB"
       },
       "dify": {
