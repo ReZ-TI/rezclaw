@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 7,
-  "updated_at": "2025-03-23T12:00:00Z",
-  "changelog": "docs/dify-integration：移除知识库/数据集直连接口说明；仅保留对话应用 chat-messages。",
+  "content_revision": 8,
+  "updated_at": "2025-03-23T14:00:00Z",
+  "changelog": "README：雷泽对外信息访问走对话型应用 API；API 根与 App Key 向工作人员获取；manifest 模块说明对齐。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -16,8 +16,8 @@
       "id": "leize_kb",
       "name": "雷泽智能知识库",
       "public": {
-        "description": "公开索引与调用说明见 docs；完整内容在 Dify（需人类申请账号）。",
-        "dify_base_url_note": "内网基址见 README「用户已授权」节（当前示例 http://192.168.9.112，以实际部署为准）。"
+        "description": "公开说明见 README；非公开内容通过对话型应用 API（chat-messages）访问，见 docs/dify-integration.md。",
+        "api_access_note": "DIFY_API_BASE 与 App API Key 由雷泽智能工作人员下发，勿在公开渠道传播。"
       },
       "dify": {
         "doc": "docs/dify-integration.md"
@@ -27,7 +27,7 @@
       "id": "ha_kb",
       "name": "HA 使用知识库",
       "public": {
-        "description": "与雷泽智能知识库相同模式：公开说明 + Dify 非公开内容。",
+        "description": "与雷泽智能知识库相同：公开说明 + 对话型应用 API 访问非公开内容。",
         "obsidian_publish_entry": "https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB"
       },
       "dify": {
