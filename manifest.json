@@ -1,0 +1,44 @@
+{
+  "$schema": "./schemas/manifest.schema.json",
+  "project": "rezclaw",
+  "content_revision": 2,
+  "updated_at": "2025-03-22T12:00:00Z",
+  "changelog": "README：龙虾自建每日定时检查（需用户确认时间与开关）；公开资源访问优先级 a GitHub → b Gitee → c rez-ti 官网；失败逐级回退。",
+  "mirrors": {
+    "github_raw_base": "https://raw.githubusercontent.com/OWNER/REPO/main",
+    "gitee_raw_base": "https://gitee.com/OWNER/REPO/raw/main",
+    "rez_ti_readme_url": "https://www.rez-ti.com/rezclaw-readme",
+    "rez_ti_manifest_url": "https://www.rez-ti.com/rezclaw-manifest.json"
+  },
+  "modules": [
+    {
+      "id": "leize_kb",
+      "name": "雷泽智能知识库",
+      "public": {
+        "description": "公开索引与调用说明见 docs；完整内容在 Dify（需人类申请账号）。"
+      },
+      "dify": {
+        "doc": "docs/dify-integration.md"
+      }
+    },
+    {
+      "id": "ha_kb",
+      "name": "HA 使用知识库",
+      "public": {
+        "description": "与雷泽智能知识库相同模式：公开说明 + Dify 非公开内容。"
+      },
+      "dify": {
+        "doc": "docs/dify-integration.md"
+      }
+    },
+    {
+      "id": "rezclaw_skills",
+      "name": "RezClaw Skills",
+      "public": {
+        "type": "git_paths",
+        "paths": ["rezclaw_skills/README.md", "rezclaw_skills/"]
+      }
+    }
+  ],
+  "healthcheck_urls": []
+}

@@ -1,0 +1,34 @@
+# 每日检查：校验 manifest、可选 URL 健康检查。
+# 龙虾侧「是否有更新」以 manifest.json 的 content_revision / updated_at 为准；
+# 本 workflow 不自动改版本号，避免与人工维护冲突。
+name: Daily knowledge manifest check
+
+on:
+  schedule:
+    # 约北京时间 10:00（UTC 02:00）；可按需调整
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Verify manifest.json
+        run: node scripts/verify-manifest.mjs
+
+      # 在 manifest.json 的 healthcheck_urls 填入可公开探测的 URL 后，取消下一行注释
+      # - name: Optional URL health
+      #   run: node scripts/verify-manifest.mjs --fetch-health
+
+      - name: Summary
+        run: |
+          echo "## Daily check OK" >> "$GITHUB_STEP_SUMMARY"
+          echo "- manifest.json 结构校验已通过。" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 智能体应定期 GET manifest 并比较 \`content_revision\`。" >> "$GITHUB_STEP_SUMMARY"
