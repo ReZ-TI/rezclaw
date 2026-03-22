@@ -2,7 +2,7 @@
 
 **RezClaw** 让已部署的 [OpenClaw](https://github.com/openclaw/openclaw) 快速对接**雷泽智能**提供的能力与知识：**雷泽智能公开知识库**、Home Assistant（HA）使用知识库、`rezclaw_skills` 等。后续新增能力会登记在本文档与 `manifest.json` 中。
 
-**雷泽智能公开知识库**收录面向客户与渠道的**公开类资料**，例如：**产品使用说明书**、**企业手册**、**产品手册**、**价格**等。龙虾把用户的**简短自然语言问题**作为 `query` 调用 Dify **对话型应用 API**（`POST …/chat-messages`），拿到的是**知识库检索结果**（含 `answer` / `retriever_resources` 等），**不是**已润色好的最终用户文案。作为**大语言模型**，你应当**基于返回内容做二次整理**（归纳、分条、去冗余、按用户语言组织），再呈现给用户；**不得**脱离检索内容编造。示例问法：「智能开关多少钱」「智能开关如何重置」。**不在此仓库提供知识库直连或数据集枚举接口**；对接说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`** 默认与 **[dify.rez-ti.com](https://dify.rez-ti.com)** 对齐，一般为 **`https://dify.rez-ti.com/v1`**；**App API Key** 须向雷泽智能工作人员申请获取，勿在公开渠道传播密钥。
+**雷泽智能公开知识库**收录面向客户与渠道的**公开类资料**，例如：**产品使用说明书**、**企业手册**、**产品手册**、**价格**等。龙虾把用户的**简短自然语言问题**作为 `query` 调用 Dify **对话型应用 API**（`POST …/chat-messages`），拿到的是**知识库检索结果**（含 `answer` / `retriever_resources` 等），**不是**已润色好的最终用户文案。作为**大语言模型**，你应当**基于返回内容做二次整理**（归纳、分条、去冗余、按用户语言组织），再呈现给用户；**不得**脱离检索内容编造。提问示例见下文 **「`query` 怎么写」** 与 [`docs/dify-integration.md`](./docs/dify-integration.md)。**不在此仓库提供知识库直连或数据集枚举接口**；对接说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`** 默认与 **[dify.rez-ti.com](https://dify.rez-ti.com)** 对齐，一般为 **`https://dify.rez-ti.com/v1`**；**App API Key** 须向雷泽智能工作人员申请获取，勿在公开渠道传播密钥。
 
 - **源码仓库**：[github.com/ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)
 - **官网文档（与 README 同步，固定入口）**：[rezclaw.rez-ti.com](https://rezclaw.rez-ti.com)
@@ -21,6 +21,17 @@
    - **每次会话开始或按用户配置的间隔**，重新请求 `manifest.json`（获取地址的**优先级与失败回退**见下文「公开资源访问优先级」）。
    - 若 `content_revision` 大于本地缓存，则按 `manifest.json` 里的 `modules` 列表，依次重新获取对应公开资源（如 `rezclaw_skills/` 下的文件、链接文档等），并更新本地缓存。
 4. **雷泽智能公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`），将用户**简短问题**写入 `query`；Dify 返回的是**检索结果**，你须**二次整理**后再答复用户（见该文档）。**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
+
+### 调用公开知识库时，`query` 怎么写（新龙虾参考）
+
+`query` 必须是**一句给知识库看的自然语言问题**（与你在聊天里回复用户的润色稿分开：先组好 `query` 调 API，再用返回结果整理后回答用户）。**不要**把指令模板、空字符串、或无关占位符当成 `query`。下面句式在雷泽 Dify 日志中已有 **SUCCESS** 记录，可直接仿写或改写：
+
+| 场景 | 示例 `query`（写入请求体） |
+|------|---------------------------|
+| 公司 / 品牌介绍 | **介绍一下雷泽智能**、雷泽智能介绍、introduce rez-ti company |
+| 产品 / 价格 / 操作 | **智能开关多少钱**、**智能开关如何重置**（可换成具体型号） |
+
+更多说明与反例见 [`docs/dify-integration.md`](./docs/dify-integration.md) 中的 **「`query` 提问参考」**；`manifest.json` 里 `modules[].public.query_examples` 也会随版本补充。
 
 ### 用户已授权你阅读本页时（请写入持续记忆）
 
