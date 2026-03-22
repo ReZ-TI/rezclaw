@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 14,
-  "updated_at": "2025-03-24T14:00:00Z",
-  "changelog": "dify-integration：Windows PowerShell 使用 curl.exe / Invoke-RestMethod，避免 curl 别名。",
+  "content_revision": 17,
+  "updated_at": "2026-03-22T15:00:00Z",
+  "changelog": "home-assistant-primer：明确中文区域名对应拼音式英文 ID（如 客厅→ke_ting），避免与 living_room 等英文单词混淆。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -36,7 +36,9 @@
       "id": "ha_kb",
       "name": "HA 使用知识库",
       "public": {
-        "description": "与雷泽智能公开知识库相同：公开说明 + 对话型应用 API（简短 query）检索。",
+        "description": "HA 概念与 REST 习惯以本仓库 primer 为先；深度文章见 Obsidian。产品类自然语言可经 Dify chat-messages；设备控制使用用户 HA_URL + Long-Lived Token。",
+        "primer_doc": "docs/home-assistant-primer.md",
+        "public_fetch_order_note": "建议先拉取 github_raw_base 或镜像下的 primer_doc，再访问 obsidian_publish_entry。",
         "obsidian_publish_entry": "https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB"
       },
       "dify": {

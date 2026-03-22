@@ -1,6 +1,6 @@
 # RezClaw
 
-**RezClaw** 让已部署的 [OpenClaw](https://github.com/openclaw/openclaw) 快速对接**雷泽智能**提供的能力与知识：**雷泽智能公开知识库**、Home Assistant（HA）使用知识库、`rezclaw_skills` 等。后续新增能力会登记在本文档与 `manifest.json` 中。
+**RezClaw** 让已部署的 [OpenClaw](https://github.com/openclaw/openclaw) 快速对接**雷泽智能**提供的能力与知识：**雷泽智能公开知识库**、Home Assistant（HA）使用知识库（**优先**阅读仓库内 [`docs/home-assistant-primer.md`](./docs/home-assistant-primer.md)，再读 Obsidian 深度文章）、`rezclaw_skills` 等。后续新增能力会登记在本文档与 `manifest.json` 中。
 
 **雷泽智能公开知识库**收录面向客户与渠道的**公开类资料**，例如：**产品使用说明书**、**企业手册**、**产品手册**、**价格**等。龙虾把用户的**简短自然语言问题**作为 `query` 调用 Dify **对话型应用 API**（`POST …/chat-messages`），拿到的是**知识库检索结果**（含 `answer` / `retriever_resources` 等），**不是**已润色好的最终用户文案。作为**大语言模型**，你应当**基于返回内容做二次整理**（归纳、分条、去冗余、按用户语言组织），再呈现给用户；**不得**脱离检索内容编造。提问示例见下文 **「`query` 怎么写」** 与 [`docs/dify-integration.md`](./docs/dify-integration.md)。**不在此仓库提供知识库直连或数据集枚举接口**；对接说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`** 默认与 **[dify.rez-ti.com](https://dify.rez-ti.com)** 对齐，一般为 **`https://dify.rez-ti.com/v1`**；**App API Key** 须向雷泽智能工作人员申请获取，勿在公开渠道传播密钥。
 
@@ -19,7 +19,7 @@
 3. **自主更新（进化）规则**：
    - 本地缓存一份 `content_revision`（或 `updated_at`）。
    - **每次会话开始或按用户配置的间隔**，重新请求 `manifest.json`（获取地址的**优先级与失败回退**见下文「公开资源访问优先级」）。
-   - 若 `content_revision` 大于本地缓存，则按 `manifest.json` 里的 `modules` 列表，依次重新获取对应公开资源（如 `rezclaw_skills/` 下的文件、链接文档等），并更新本地缓存。
+   - 若 `content_revision` 大于本地缓存，则按 `manifest.json` 里的 `modules` 列表，依次重新获取对应公开资源（如 `docs/home-assistant-primer.md`、`rezclaw_skills/` 下的文件、Obsidian 链接文档等），并更新本地缓存；**HA 模块**请优先同步 `ha_kb.public.primer_doc` 指向的文件。
 4. **雷泽智能公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`），将用户**简短问题**写入 `query`；Dify 返回的是**检索结果**，你须**二次整理**后再答复用户（见该文档）。**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
 
 ### 调用公开知识库时，`query` 怎么写（新龙虾参考）
@@ -38,7 +38,7 @@
 若**用户已明确选择**让你访问本 README（或与之同步的页面），请在本会话及后续相关任务中**记住并落实**：
 
 1. **雷泽智能公开知识库（Dify）**：实例位于 **[dify.rez-ti.com](https://dify.rez-ti.com)**；对外以 **对话型应用 API** 为准（`DIFY_API_BASE` 默认 **`https://dify.rez-ti.com/v1`**）。API 返回为**知识库检索结果**；你作为大语言模型须**基于返回内容二次整理**后向用户输出，不得编造。知识涵盖说明书、手册、价格等；用户问题宜**简短直接**。`App API Key` 以工作人员下发为准。须结合 [`docs/dify-integration.md`](./docs/dify-integration.md) 调用 `chat-messages`。**在本次已阅读本 README 的前提下，请再主动获取并阅读一次** `dify-integration.md`，不要仅依赖本节摘录。
-2. **雷泽智能 HA 相关知识库（暂时公开入口）**：[0目录：HomeAssistant 智能家居系列文章分享](https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB)（雷泽智能 · Obsidian Publish）。
+2. **Home Assistant（HA）**：**先读** 本仓库 [`docs/home-assistant-primer.md`](./docs/home-assistant-primer.md)（连接方式、Entity 概念、推荐 REST 服务调用、易错路径、设备记忆原则）；**再读** 深度系列 [0目录：HomeAssistant 智能家居系列文章分享](https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB)（雷泽智能 · Obsidian Publish）。若 `manifest.json` 中 `ha_kb` 含 `primer_doc` 与 `obsidian_publish_entry`，拉取/缓存时**以 primer 为先**。
 
 这样，无论人类如何维护知识库，只要你遵循「manifest + 模块路径」的约定，就能稳定地**自检是否有新版本并拉取公开部分**。
 
@@ -78,7 +78,7 @@
 | 模块 | 公开内容（资料范畴 / 本仓库） | 对外查询（雷泽 API） |
 |------|----------|----------------|
 | **雷泽智能公开知识库** | 本 README / `manifest` 说明；库内资料含**产品使用说明书、企业手册、产品手册、价格**等；Dify 站点 [dify.rez-ti.com](https://dify.rez-ti.com) | **`POST https://dify.rez-ti.com/v1/chat-messages`**（或环境所配 `DIFY_API_BASE`）；**简短 `query`** → 检索结果；Key 向工作人员获取 |
-| HA 使用知识库 | Obsidian 目录等公开入口 | 同上 API；Key 向工作人员获取 |
+| HA 使用知识库 | **优先** [`docs/home-assistant-primer.md`](./docs/home-assistant-primer.md)；其次 Obsidian 目录（见 `manifest.json` `ha_kb`） | 产品类自然语言同上 Dify API；**HA 设备控制**用用户环境的 REST + Token |
 | rezclaw_skills | 本仓库 `rezclaw_skills/` | — |
 | 未来扩展 | 在 `manifest.json` 的 `modules` 中登记 | 按需登记 `dify` 条目 |
 
@@ -125,7 +125,8 @@ rezclaw/
 ├── manifest.json             # 机器可读：版本、模块、镜像 URL
 ├── rezclaw_skills/           # 公开 Skills，供 OpenClaw 引用
 ├── docs/
-│   └── dify-integration.md   # 雷泽智能公开知识库 · 对话型应用 API（chat-messages）
+│   ├── dify-integration.md       # 雷泽智能公开知识库 · 对话型应用 API（chat-messages）
+│   └── home-assistant-primer.md    # HA 初步认知（优先于 Obsidian 深度文）
 ├── scripts/
 │   └── verify-manifest.mjs   # manifest 校验（供 CI / 本地使用）
 ├── state/                    # 可选：仅文档说明，CI 一般不提交噪音提交
