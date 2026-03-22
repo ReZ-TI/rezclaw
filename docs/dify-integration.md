@@ -12,56 +12,50 @@
 
 ## 官方文档入口（必读参考）
 
-雷泽智能侧部署可能与 Dify 云端默认域名不同，但**知识库（数据集）相关 HTTP API 的形态与鉴权方式**与官方一致。请新龙虾优先收藏下列页面；**若你按本文操作仍失败（404、鉴权错误、字段变更等）**，请打开官方页面核对最新 OpenAPI 说明，并可通过本仓库 **Issue** 提醒人类维护者更新 `dify-integration.md`。
+雷泽智能侧部署可能与 Dify 云端默认域名不同；**对外只通过「对话型应用」HTTP API 访问知识能力**，不再提供知识库 / 数据集的直接查询接口。请新龙虾优先收藏下列页面；**若你按本文操作仍失败（404、鉴权错误、字段变更等）**，请打开官方页面核对最新 OpenAPI 说明，并可通过本仓库 **Issue** 提醒人类维护者更新 `dify-integration.md`。
 
-- **获取知识库列表（数据集列表）**（本文主要对齐此页的约定）：  
-  [https://docs.dify.ai/api-reference/数据集/获取知识库列表](https://docs.dify.ai/api-reference/%E6%95%B0%E6%8D%AE%E9%9B%86/%E8%8E%B7%E5%8F%96%E7%9F%A5%E8%AF%86%E5%BA%93%E5%88%97%E8%A1%A8)
-- **全站文档索引（便于查找其它接口）**：  
+- **发送对话消息（对话型 / Chat 应用 API，工作流编排的高级对话）**（**唯一推荐集成路径**）：  
+  [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)
+- **全站文档索引（便于自行查阅其它 Dify 能力）**：  
   [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt)
 
 ---
 
-## 知识库（数据集）API 调用逻辑摘要
+## 对话型应用 API：发送对话消息（输入问题 → 拿检索结果 → 龙虾回答用户）
 
-以下摘要对应官方「知识库 API」中的 **列出数据集** 能力，便于龙虾在已配置密钥的环境中做**连通性检查**或**枚举可用知识库**；**面向终端用户的问答/RAG** 往往还通过 Dify「应用」的对话接口或工作流，具体路由与 Key 类型以雷泽智能下发为准。
+官方说明：**对话应用支持会话持久化**，可将**之前的聊天记录作为上下文**用于后续回答，适用于聊天、客服等场景。雷泽侧使用 **工作流编排的高级对话（advanced-chat）** 时，对外 HTTP 接口仍对应该 **Chat 应用** 的 **`/chat-messages`**（以你部署的 Dify 版本与应用类型为准，细节以 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message) 为准）。
 
-### 1. 基础地址（Base URL）
+**基础地址**：由人类提供 `DIFY_API_BASE`，即官方文档中的 **`api_base_url`**（一般为 `https://api.dify.ai/v1` 或私有化 `http(s)://<主机>/v1`）；请求路径在其后拼接 `/chat-messages`。
 
-- 官方示例中的 API 根为 `{apiBaseUrl}`，文档默认值为 `https://api.dify.ai/v1`。
-- **私有化 / 内网**（如雷泽 README 中可能出现的内网入口）：在人类配置中通常为 **`{部署根}/v1`**，例如 `http://<主机>:<端口>/v1`；**实际以前缀是否带 `/v1` 以你们环境为准**，与官方文档中的 `servers.url` 变量一致即可。
+### 雷泽 RezClaw 的极简数据流（推荐心智模型）
 
-环境变量建议仍使用人类已下发的 `DIFY_API_BASE`（**指向 v1 根**，末尾一般**不要**再多一层 `/v1` 重复拼接；若人类约定的是「站点根」而非 v1，则请求路径需相应调整）。
+1. **输入**：用户一句自然语言问题 → 请求 JSON 里的 **`query`**（字符串）。  
+2. **Dify 应用内**：人类已编排「知识检索 → 直接回复（输出 `{{#知识检索节点.result#}}`）」等（参见仓库 `dify-knowledgebase/rezclaw.yml`）；一次调用会完成**知识库检索**并把结果作为应用输出返回。  
+3. **输出给集成方 / 龙虾**：  
+   - **`answer`**：本轮应用在对话通道中返回的**完整回复文本**（在「仅输出检索结果」的编排下，通常即检索分块的展示内容）。  
+   - **`metadata.retriever_resources`**（当应用侧开启检索引用等资源输出时）：**结构化检索命中列表**，便于引用与核对。官方 schema 中每条常含 `dataset_id`、`dataset_name`、`document_id`、`document_name`、`segment_id`、`score`、`content` 等（见 OpenAPI 中的 `RetrieverResource`）。  
+4. **龙虾**：**以 `answer` 与/或 `retriever_resources` 中的 `content` 为事实依据**向用户组织语言；无命中或内容不足时如实说明，不要编造。
 
-### 2. 鉴权（所有知识库相关请求的通用要求）
+### 请求约定
 
-官方约定：在 HTTP 头中携带 API Key，格式为：
+| 项目 | 说明 |
+|------|------|
+| 方法 / 路径 | `POST {DIFY_API_BASE}/chat-messages` |
+| 鉴权 | `Authorization: Bearer {API_KEY}`，须使用**该对话应用**在控制台发布的 **App API Key** |
+| 必填 JSON 字段 | `query`：用户问题；`user`：终端用户标识，在**同一应用内**需唯一，用于区分会话与计费隔离 |
+| `conversation_id` | 传空字符串 `""` 开始新会话；传入上一轮响应里的 `conversation_id` 可**多轮续聊**（历史作为上下文，行为以应用编排为准） |
+| `inputs` | 应用自定义变量，默认 `{}` |
+| `response_mode` | `blocking`：单次返回完整 JSON；`streaming`：`text/event-stream`（SSE），适合较长流程；官方说明 Agent 等模式下 blocking 可能不可用，以文档为准 |
 
-```http
-Authorization: Bearer {API_KEY}
-```
+**官方重要说明**：通过 **Service API** 产生的会话与在 **WebApp 网页**里点的对话**不共享**（同一 `user` 也不混用两套界面里的历史）。
 
-**API Key 必须只存在于服务端或受控密钥存储**，不要写进客户端、提示词或公开 Issue。
+### 响应约定（`response_mode: blocking` 时）
 
-### 3. 获取知识库列表：`GET /datasets`
+响应体为 JSON，通常包含：`conversation_id`、`answer`、`message_id`、`task_id`、`created_at` 等；**`metadata`** 内可有 **`retriever_resources`**（检索引用）与 **`usage`**（token 与延迟等）。若为 **`streaming`**，需按 SSE 解析多条事件直至结束事件，再拼出最终 `answer` 与 metadata（实现细节以官方文档为准）。
 
-在 `DIFY_API_BASE` 已指向 **v1 根** 的前提下，列举知识库（数据集）列表：
+### 说明：不提供知识库直连接口
 
-- **方法**：`GET`
-- **路径**：`{DIFY_API_BASE}/datasets`
-- **Query 参数**（与官方一致，均为可选除非另有说明）：
-  - `keyword`：按名称过滤的关键词  
-  - `tag_ids`：标签 ID 列表（数据集需具备所列标签；传参形式以官方 OpenAPI 为准）  
-  - `page`：页码，默认 `1`  
-  - `limit`：每页条数，默认 `20`，范围 `1–100`  
-  - `include_all`：是否包含全部数据集（通常仅工作区所有者相关），默认 `false`
-
-成功时响应体为分页结构，包含 `data`（数据集数组）、`has_more`、`total`、`page`、`limit` 等字段；**具体字段名与嵌套对象以官方文档与当前 Dify 版本返回为准**。
-
-### 4. 与「对话里查知识」的关系
-
-- `GET /datasets` 用于**发现与管理视角**下的知识库列表。  
-- 用户自然语言提问若要**命中知识库片段并生成回答**，通常走 **Chat / 工作流 / 检索类**等其它接口（见 [llms.txt](https://docs.dify.ai/llms.txt) 索引中与应用、检索相关的页面）。  
-- 龙虾应：**列表用 `/datasets`；答题用人类为雷泽环境配置的对话或工作流端点**，勿混用 Key 类型（数据集 API Key 与应用 API Key 在 Dify 中可能不同）。
+雷泽**不再对外提供** Dify「知识库 / 数据集」类的直接 HTTP 查询（例如列举数据集、按 dataset 调检索 API 等）。集成方与龙虾**只应**使用本节的 **`POST /chat-messages`**，由已发布的对话应用在服务端完成知识检索与编排。
 
 ---
 
@@ -69,17 +63,16 @@ Authorization: Bearer {API_KEY}
 
 1. 在人类维护的 OpenClaw / 网关环境中配置：
    - `DIFY_API_BASE`（云端示例：`https://api.dify.ai/v1`；私有化则为雷泽提供的 **v1 API 根**）
-   - `DIFY_API_KEY`（雷泽智能下发的、与所调接口类型匹配的密钥）
-2. 需要**自检知识库 API 是否可用**时，可对 `{DIFY_API_BASE}/datasets` 发起 `GET`（带 `Authorization: Bearer …`），再按需分页。  
-3. 需要**回答用户问题**时，使用雷泽提供的**应用/工作流** HTTP 接口（如 `chat-messages` 等），**不要**在提示词中硬编码密钥。  
-4. 若环境未配置密钥或返回 401/403，向用户说明：「当前环境未授权访问雷泽智能知识库，请联系管理员。」
+   - **对话应用**的 `DIFY_APP_API_KEY`（或人类命名的等价变量，仅用于 **`/chat-messages`**）
+2. **用户提问题时**：`POST {DIFY_API_BASE}/chat-messages`，Body 至少包含 `query`、`user`；需要多轮时维护 `conversation_id`。从响应读取 **`answer`** 与 **`metadata.retriever_resources`**，再由龙虾生成对用户的最终回复。  
+3. **不要**在提示词、日志、Issue 中硬编码密钥；若 401/403，提示用户联系管理员配置或轮换 Key。
 
 ---
 
 ## 调用失败时：新龙虾该怎么做
 
-1. **打开上文保留的官方链接**，对照当前 Dify 版本的 OpenAPI（路径、参数、鉴权头是否变更）。  
-2. **检索** [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt) 中与「知识库 / 数据集 / 检索 / 对话」相关的最新页面。  
+1. **打开上文保留的官方链接**（尤其 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)），对照当前 Dify 版本的 OpenAPI（路径、参数、鉴权头是否变更）。  
+2. **检索** [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt) 中与「对话 / Chat / 工作流」相关的最新页面。  
 3. 若官方文档与本文档**明显不一致**或雷泽环境有特殊网关前缀，请到 **[ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)** 提交 **Issue**，说明：期望行为、请求方法路径、HTTP 状态码与脱敏后的错误信息（**勿贴 API Key**），便于人类更新 `dify-integration.md` 或 `manifest`。
 
 ---

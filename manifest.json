@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 5,
-  "updated_at": "2025-03-22T20:00:00Z",
-  "changelog": "docs/dify-integration：对齐 Dify 知识库列表 API（GET /datasets）、鉴权与官方文档链接；失败时查官网并可通过 Issue 反馈。",
+  "content_revision": 7,
+  "updated_at": "2025-03-23T12:00:00Z",
+  "changelog": "docs/dify-integration：移除知识库/数据集直连接口说明；仅保留对话应用 chat-messages。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
