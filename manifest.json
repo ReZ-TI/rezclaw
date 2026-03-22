@@ -1,21 +1,23 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 2,
-  "updated_at": "2025-03-22T12:00:00Z",
-  "changelog": "README：龙虾自建每日定时检查（需用户确认时间与开关）；公开资源访问优先级 a GitHub → b Gitee → c rez-ti 官网；失败逐级回退。",
+  "content_revision": 4,
+  "updated_at": "2025-03-22T18:00:00Z",
+  "changelog": "mirrors：正式 GitHub ReZ-TI/rezclaw RAW；官网文档固定 https://rezclaw.rez-ti.com（README 页 + /manifest.json）。",
   "mirrors": {
-    "github_raw_base": "https://raw.githubusercontent.com/OWNER/REPO/main",
+    "github_repo": "https://github.com/ReZ-TI/rezclaw",
+    "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
     "gitee_raw_base": "https://gitee.com/OWNER/REPO/raw/main",
-    "rez_ti_readme_url": "https://www.rez-ti.com/rezclaw-readme",
-    "rez_ti_manifest_url": "https://www.rez-ti.com/rezclaw-manifest.json"
+    "rez_ti_readme_url": "https://rezclaw.rez-ti.com/",
+    "rez_ti_manifest_url": "https://rezclaw.rez-ti.com/manifest.json"
   },
   "modules": [
     {
       "id": "leize_kb",
       "name": "雷泽智能知识库",
       "public": {
-        "description": "公开索引与调用说明见 docs；完整内容在 Dify（需人类申请账号）。"
+        "description": "公开索引与调用说明见 docs；完整内容在 Dify（需人类申请账号）。",
+        "dify_base_url_note": "内网基址见 README「用户已授权」节（当前示例 http://192.168.9.112，以实际部署为准）。"
       },
       "dify": {
         "doc": "docs/dify-integration.md"
@@ -25,7 +27,8 @@
       "id": "ha_kb",
       "name": "HA 使用知识库",
       "public": {
-        "description": "与雷泽智能知识库相同模式：公开说明 + Dify 非公开内容。"
+        "description": "与雷泽智能知识库相同模式：公开说明 + Dify 非公开内容。",
+        "obsidian_publish_entry": "https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB"
       },
       "dify": {
         "doc": "docs/dify-integration.md"
