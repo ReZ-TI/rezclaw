@@ -123,7 +123,7 @@
 rezclaw/
 ├── README.md                 # 本说明（可与官网页同步）
 ├── manifest.json             # 机器可读：版本、模块、镜像 URL
-├── rezclaw_skills/           # 公开 Skills，供 OpenClaw 引用
+├── rezclaw_skills/           # 公开 Skills（含 ec_manager_china 等角色），供 OpenClaw 引用
 ├── docs/
 │   ├── dify-integration.md       # 雷泽智能公开知识库 · 对话型应用 API（chat-messages）
 │   └── home-assistant-primer.md    # HA 初步认知（优先于 Obsidian 深度文）
