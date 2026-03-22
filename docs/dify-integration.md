@@ -12,7 +12,7 @@
 
 ## 官方文档入口（必读参考）
 
-雷泽智能侧部署可能与 Dify 云端默认域名不同；**对外只通过「对话型应用」HTTP API 访问知识能力**，不再提供知识库 / 数据集的直接查询接口。请新龙虾优先收藏下列页面；**若你按本文操作仍失败（404、鉴权错误、字段变更等）**，请打开官方页面核对最新 OpenAPI 说明，并可通过本仓库 **Issue** 提醒人类维护者更新 `dify-integration.md`。
+**雷泽智能**的 Dify 与公开知识库部署在 **[dify.rez-ti.com](https://dify.rez-ti.com)**；对话型应用 HTTP API 的 **v1 根**（即 `DIFY_API_BASE`）一般为 **`https://dify.rez-ti.com/v1`**，与 `manifest.json` 中 `mirrors.dify_api_base` 保持一致（若工作人员另有说明，以交付为准）。**对外只通过「对话型应用」API 访问知识能力**，不提供知识库 / 数据集直连接口。请新龙虾优先收藏下列页面；**若你按本文操作仍失败（404、鉴权错误、字段变更等）**，请对照官方 OpenAPI 与当前部署版本，并可通过本仓库 **Issue** 提醒人类维护者更新 `dify-integration.md`。
 
 - **发送对话消息（对话型 / Chat 应用 API，工作流编排的高级对话）**（**唯一推荐集成路径**）：  
   [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)
@@ -25,7 +25,7 @@
 
 官方说明：**对话应用支持会话持久化**，可将**之前的聊天记录作为上下文**用于后续回答，适用于聊天、客服等场景。雷泽侧使用 **工作流编排的高级对话（advanced-chat）** 时，对外 HTTP 接口仍对应该 **Chat 应用** 的 **`/chat-messages`**（以你部署的 Dify 版本与应用类型为准，细节以 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message) 为准）。
 
-**基础地址**：由人类提供 `DIFY_API_BASE`，即官方文档中的 **`api_base_url`**（一般为 `https://api.dify.ai/v1` 或私有化 `http(s)://<主机>/v1`）；请求路径在其后拼接 `/chat-messages`。
+**基础地址**：环境变量 **`DIFY_API_BASE`** 即官方文档中的 **`api_base_url`**。雷泽默认 **`https://dify.rez-ti.com/v1`**；若使用 Dify 官方云托管的应用，则可能为 `https://api.dify.ai/v1` 等。完整对话请求示例：`POST https://dify.rez-ti.com/v1/chat-messages`（路径前段以实际 `DIFY_API_BASE` 为准）。
 
 ### 雷泽 RezClaw 的极简数据流（推荐心智模型）
 
@@ -33,10 +33,11 @@
 
 1. **输入**：用户一句**简短自然语言问题** → 请求 JSON 里的 **`query`**（字符串）。  
 2. **Dify 应用内**：人类已编排「知识检索 → 直接回复（输出 `{{#知识检索节点.result#}}`）」等（参见仓库 `dify-knowledgebase/rezclaw.yml`）；一次调用会完成**知识库检索**并把结果作为应用输出返回。  
-3. **输出给集成方 / 龙虾**：  
-   - **`answer`**：本轮应用在对话通道中返回的**完整回复文本**（在「仅输出检索结果」的编排下，通常即检索分块的展示内容）。  
-   - **`metadata.retriever_resources`**（当应用侧开启检索引用等资源输出时）：**结构化检索命中列表**，便于引用与核对。官方 schema 中每条常含 `dataset_id`、`dataset_name`、`document_id`、`document_name`、`segment_id`、`score`、`content` 等（见 OpenAPI 中的 `RetrieverResource`）。  
-4. **龙虾**：**以 `answer` 与/或 `retriever_resources` 中的 `content` 为事实依据**向用户组织语言；无命中或内容不足时如实说明，不要编造。
+3. **输出给集成方 / 龙虾（本质是检索结果，不是润色后的最终话术）**：  
+   - **`answer`**：在雷泽当前编排下多为**知识库检索命中**的拼接或序列化展示（可能含多段、列表、元数据字段等），**不等同于**已面向终端用户润色好的完整回答。  
+   - **`metadata.retriever_resources`**（若存在）：**结构化检索命中列表**，便于引用与核对；每条常含 `content`、`document_name`、`score` 等（见 OpenAPI 的 `RetrieverResource`）。  
+4. **龙虾（大语言模型）二次整理（必做）**：你须**严格以**上述返回中的事实为据，对用户做**二次整理**再输出——例如归纳要点、分条说明操作步骤、统一术语、去掉重复与版式噪声、按用户语言与场景写成自然段落；**禁止**编造检索中未出现的信息。若无命中或内容不足以回答，应如实说明，并可建议用户换问法或联系人类。  
+5. **`response_mode` 提示**：雷泽侧 **advanced-chat / 工作流** 在 **`dify.rez-ti.com`** 上实测可能以 **SSE（`streaming`）** 为主；若 **`blocking`** 长时间仅收到心跳类事件而无完整 JSON，请改用 **`streaming`**，解析 `message` / `workflow_finished` 等事件中的 `answer` 与节点输出后再做第 4 步整理。
 
 ### 请求约定
 
@@ -64,9 +65,9 @@
 ## 推荐集成方式（由人类配置完成后，龙虾仅调用）
 
 1. 在人类维护的 OpenClaw / 网关环境中配置：
-   - `DIFY_API_BASE`（云端示例：`https://api.dify.ai/v1`；私有化则为雷泽提供的 **v1 API 根**）
+   - `DIFY_API_BASE`：**雷泽默认** `https://dify.rez-ti.com/v1`（见 `manifest.json` → `mirrors.dify_api_base`）；其它部署以工作人员下发为准
    - **对话应用**的 `DIFY_APP_API_KEY`（或人类命名的等价变量，仅用于 **`/chat-messages`**）
-2. **用户提问题时**：`POST {DIFY_API_BASE}/chat-messages`，Body 至少包含 `query`、`user`；需要多轮时维护 `conversation_id`。从响应读取 **`answer`** 与 **`metadata.retriever_resources`**，再由龙虾生成对用户的最终回复。  
+2. **用户提问题时**：`POST {DIFY_API_BASE}/chat-messages`，Body 至少包含 `query`、`user`；需要多轮时维护 `conversation_id`。从响应读取 **`answer`** 与 **`metadata.retriever_resources`**；**龙虾须将检索结果视为原始材料，经二次整理后再回复用户**（见上文第 4 点）。  
 3. **不要**在提示词、日志、Issue 中硬编码密钥；若 401/403，提示用户联系管理员配置或轮换 Key。
 
 ---
