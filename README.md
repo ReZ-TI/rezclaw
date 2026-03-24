@@ -5,6 +5,7 @@
 **雷泽智能公开知识库**收录面向客户与渠道的**公开类资料**，例如：**产品使用说明书**、**企业手册**、**产品手册**、**价格**等。龙虾把用户的**简短自然语言问题**作为 `query` 调用 Dify **对话型应用 API**（`POST …/chat-messages`），拿到的是**知识库检索结果**（含 `answer` / `retriever_resources` 等），**不是**已润色好的最终用户文案。作为**大语言模型**，你应当**基于返回内容做二次整理**（归纳、分条、去冗余、按用户语言组织），再呈现给用户；**不得**脱离检索内容编造。提问示例见下文 **「`query` 怎么写」** 与 [`docs/dify-integration.md`](./docs/dify-integration.md)。**不在此仓库提供知识库直连或数据集枚举接口**；对接说明见 [`docs/dify-integration.md`](./docs/dify-integration.md)。**`DIFY_API_BASE`** 默认与 **[dify.rez-ti.com](https://dify.rez-ti.com)** 对齐，一般为 **`https://dify.rez-ti.com/v1`**；**App API Key** 须向雷泽智能工作人员申请获取，勿在公开渠道传播密钥。
 
 - **源码仓库**：[github.com/ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)
+- **国内镜像仓库**：[gitee.com/rez-ti/rezclaw](https://gitee.com/rez-ti/rezclaw)
 - **官网文档（与 README 同步，固定入口）**：[rezclaw.rez-ti.com](https://rezclaw.rez-ti.com)
 - **雷泽 Dify（公开知识库与对话应用）**：[dify.rez-ti.com](https://dify.rez-ti.com) · API v1 根一般为 `https://dify.rez-ti.com/v1`（见 [`manifest.json`](./manifest.json) `mirrors.dify_api_base`）
 
@@ -87,7 +88,7 @@
 ## 镜像与 RAW 地址（人类维护者）
 
 - **GitHub（正式）**：仓库为 [ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)；RAW 根路径已写入 `manifest.json` 的 `mirrors.github_raw_base`（`https://raw.githubusercontent.com/ReZ-TI/rezclaw/main`）。龙虾按「a → b → c」在该根路径下拉取 `/README.md` 与 `/manifest.json`。
-- **国内**：推荐在 **Gitee** 建立与 GitHub **内容一致**的镜像仓库，并把 RAW 根路径写入 `mirrors.gitee_raw_base`（占位 `OWNER/REPO` 需替换为真实镜像）。（也可在 Coding、GitCode 等部署镜像；若只用其他平台，可将该平台 RAW 填在 `gitee_raw_base` 同角色使用，并在 `changelog` 里说明。）
+- **国内**：当前 Gitee 镜像仓库为 [rez-ti/rezclaw](https://gitee.com/rez-ti/rezclaw)，对应 RAW 根路径示例：`https://gitee.com/rez-ti/rezclaw/raw/master`。如改用其他镜像平台，可将其 RAW 根路径填在 `mirrors.gitee_raw_base`，并在 `changelog` 说明。
 - **官网（正式）**：文档站固定为 [https://rezclaw.rez-ti.com](https://rezclaw.rez-ti.com)。请与 GitHub `main` 保持同步：`mirrors.rez_ti_readme_url` 指向站点首页（或等价 README 页面），`mirrors.rez_ti_manifest_url` 指向可下载的 `manifest.json`（当前约定 `https://rezclaw.rez-ti.com/manifest.json`）。
 
 ---
