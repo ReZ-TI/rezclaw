@@ -56,7 +56,7 @@
    - **`answer`**：在雷泽当前编排下多为**知识库检索命中**的拼接或序列化展示（可能含多段、列表、元数据字段等），**不等同于**已面向终端用户润色好的完整回答。  
    - **`metadata.retriever_resources`**（若存在）：**结构化检索命中列表**，便于引用与核对；每条常含 `content`、`document_name`、`score` 等（见 OpenAPI 的 `RetrieverResource`）。  
 4. **龙虾（大语言模型）二次整理（必做）**：你须**严格以**上述返回中的事实为据，对用户做**二次整理**再输出——例如归纳要点、分条说明操作步骤、统一术语、去掉重复与版式噪声、按用户语言与场景写成自然段落；**禁止**编造检索中未出现的信息。若无命中或内容不足以回答，应如实说明，并可建议用户换问法或联系人类。  
-5. **`response_mode` 提示**：雷泽侧 **advanced-chat / 工作流** 在 **`dify.rez-ti.com`** 上实测可能以 **SSE（`streaming`）** 为主；若 **`blocking`** 长时间仅收到心跳类事件而无完整 JSON，请改用 **`streaming`**，解析 `message` / `workflow_finished` 等事件中的 `answer` 与节点输出后再做第 4 步整理。
+5. **`response_mode` 强制要求（重要）**：雷泽侧 **advanced-chat / 工作流** 在 **`dify.rez-ti.com`** 集成时，**必须使用 `streaming`（SSE）**；请不要使用 `blocking` 作为生产调用模式。集成方需按 SSE 解析 `message` / `workflow_finished` 等事件中的 `answer` 与节点输出后，再做第 4 步整理。
 
 ### 请求约定
 
@@ -67,13 +67,13 @@
 | 必填 JSON 字段 | `query`：用户问题，宜**简短直接**（如价格、操作步骤）；`user`：终端用户标识，在**同一应用内**需唯一，用于区分会话与计费隔离 |
 | `conversation_id` | 传空字符串 `""` 开始新会话；传入上一轮响应里的 `conversation_id` 可**多轮续聊**（历史作为上下文，行为以应用编排为准） |
 | `inputs` | 应用自定义变量，默认 `{}` |
-| `response_mode` | `blocking`：单次返回完整 JSON；`streaming`：`text/event-stream`（SSE），适合较长流程；官方说明 Agent 等模式下 blocking 可能不可用，以文档为准 |
+| `response_mode` | **仅使用 `streaming`**：`text/event-stream`（SSE）。雷泽当前对接要求中，`blocking` 不作为可用集成模式，请勿依赖。 |
 
 **官方重要说明**：通过 **Service API** 产生的会话与在 **WebApp 网页**里点的对话**不共享**（同一 `user` 也不混用两套界面里的历史）。
 
-### 响应约定（`response_mode: blocking` 时）
+### 响应约定（`response_mode: streaming`）
 
-响应体为 JSON，通常包含：`conversation_id`、`answer`、`message_id`、`task_id`、`created_at` 等；**`metadata`** 内可有 **`retriever_resources`**（检索引用）与 **`usage`**（token 与延迟等）。若为 **`streaming`**，需按 SSE 解析多条事件直至结束事件，再拼出最终 `answer` 与 metadata（实现细节以官方文档为准）。
+响应类型为 **SSE**（`text/event-stream`），需按事件流逐条解析，常见关注事件包括 `message`、`workflow_finished` 等，并在结束后汇总最终 `answer` 与 metadata（实现细节以官方文档为准）。
 
 ### 说明：不提供知识库直连接口
 
@@ -86,7 +86,7 @@
 1. 在人类维护的 OpenClaw / 网关环境中配置：
    - `DIFY_API_BASE`：**雷泽默认** `https://dify.rez-ti.com/v1`（见 `manifest.json` → `mirrors.dify_api_base`）；其它部署以工作人员下发为准
    - **对话应用**的 `DIFY_APP_API_KEY`（或人类命名的等价变量，仅用于 **`/chat-messages`**）
-2. **用户提问题时**：`POST {DIFY_API_BASE}/chat-messages`，Body 至少包含 `query`、`user`；需要多轮时维护 `conversation_id`。从响应读取 **`answer`** 与 **`metadata.retriever_resources`**；**龙虾须将检索结果视为原始材料，经二次整理后再回复用户**（见上文第 4 点）。  
+2. **用户提问题时**：`POST {DIFY_API_BASE}/chat-messages`，Body 至少包含 `query`、`user`，并设置 `response_mode: "streaming"`；需要多轮时维护 `conversation_id`。从 SSE 事件中读取 **`answer`** 与 **`metadata.retriever_resources`**；**龙虾须将检索结果视为原始材料，经二次整理后再回复用户**（见上文第 4 点）。  
 3. **不要**在提示词、日志、Issue 中硬编码密钥；若 401/403，提示用户联系管理员配置或轮换 Key。
 
 ---
@@ -115,9 +115,9 @@ curl.exe -sS -m 120 -N -X POST "$base/chat-messages" `
   --data-binary "@$jsonPath"
 ```
 
-流式输出为 **SSE**（多行 `data: {...}`）；若只要快速验证 **blocking** 且你方实例支持，可把 `response_mode` 改为 `blocking` 并去掉 `-N`。
+流式输出为 **SSE**（多行 `data: {...}`）；雷泽当前对接要求为 **必须使用 `streaming`**，请保持 `-N` 并按事件流解析。
 
-### 做法二：使用 `Invoke-RestMethod`（适合 `blocking`、返回整段 JSON）
+### 做法二：使用 `Invoke-RestMethod`（不推荐，仅用于兼容性排查）
 
 ```powershell
 $env:DIFY_APP_API_KEY = "你的_App_API_Key"
@@ -125,7 +125,7 @@ $uri = "https://dify.rez-ti.com/v1/chat-messages"
 $bodyObj = [ordered]@{
   query            = "介绍一下雷泽智能"
   user             = "windows-user-001"
-  response_mode    = "blocking"
+  response_mode    = "streaming"
   inputs           = @{}
 }
 $bodyJson = $bodyObj | ConvertTo-Json -Compress
@@ -136,7 +136,7 @@ Invoke-RestMethod -Uri $uri -Method Post `
   -Body $bodyJson
 ```
 
-返回值为 **已解析的 PowerShell 对象**，可直接访问 `.answer`、`.conversation_id` 等字段（以实际响应为准）。
+说明：`Invoke-RestMethod` 对 SSE 处理不如专门流式方式直观，生产集成建议优先使用上面的 `curl.exe -N` 或等价可流式消费的 HTTP 客户端。
 
 ### 做法三：安装 [PowerShell 7+](https://github.com/PowerShell/PowerShell)（`pwsh`）
 
