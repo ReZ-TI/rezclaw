@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 19,
-  "updated_at": "2026-03-24T11:25:00Z",
-  "changelog": "docs：更新 dify-integration，明确 chat-messages 必须使用 response_mode=streaming（SSE）；rezclaw_skills：新增 ec_manager_china（淘宝直通车投放分析 skills.md）；更新 skills README。",
+  "content_revision": 20,
+  "updated_at": "2026-03-24T12:05:00Z",
+  "changelog": "rezclaw_skills：新增 marketing（本地营销线索收集与跟进 skills.md）；更新 skills README 与 manifest 路径；docs：更新 dify-integration，明确 chat-messages 必须使用 response_mode=streaming（SSE）；rezclaw_skills：新增 ec_manager_china（淘宝直通车投放分析 skills.md）。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -53,9 +53,10 @@
         "paths": [
           "rezclaw_skills/README.md",
           "rezclaw_skills/ec_manager_china/skills.md",
+          "rezclaw_skills/marketing/skills.md",
           "rezclaw_skills/"
         ],
-        "roles_note": "ec_manager_china：中国电商直通车分析口径与模板，见 rezclaw_skills/ec_manager_china/skills.md"
+        "roles_note": "ec_manager_china：中国电商直通车分析口径与模板；marketing：本地营销线索收集与跟进（小红书等平台）。见 rezclaw_skills/ec_manager_china/skills.md 与 rezclaw_skills/marketing/skills.md"
       }
     }
   ],

@@ -13,5 +13,6 @@
 | 目录 / 角色 ID | 入口文件 | 说明 |
 |----------------|----------|------|
 | `ec_manager_china/` | [`ec_manager_china/skills.md`](./ec_manager_china/skills.md) | 中国电商投放分析（淘宝直通车关键词推广：口径、指标、诊断、模板、周报） |
+| `marketing/` | [`marketing/skills.md`](./marketing/skills.md) | 本地营销线索收集与跟进（小红书等平台：关键词、筛选口径、话术、日报） |
 
 其它 Skill 可按「一角色一子目录」追加；若需单独登记拉取路径，可在仓库根目录 `manifest.json` 的 `modules` 中扩展。
