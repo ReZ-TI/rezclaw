@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 22,
-  "updated_at": "2026-03-26T06:58:51Z",
-  "changelog": "rezclaw_skills/ec_manager_china：新增“浏览器自动化场景（OpenClaw 定时任务）”，补充前置条件、自动化流程、企业微信智能表格录入步骤与 openclaw.json 配置示例。",
+  "content_revision": 24,
+  "updated_at": "2026-03-26T07:24:40Z",
+  "changelog": "rezclaw_skills 架构再调整：将电商能力合并回单一 ec_manager_china（同时覆盖投放数据与店铺经营数据）；移除 taobao_shop_data_china；保持 Skill 入口统一为 SKILL.md。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -52,11 +52,11 @@
         "type": "git_paths",
         "paths": [
           "rezclaw_skills/README.md",
-          "rezclaw_skills/ec_manager_china/skills.md",
-          "rezclaw_skills/marketing/skills.md",
+          "rezclaw_skills/ec_manager_china/SKILL.md",
+          "rezclaw_skills/marketing/SKILL.md",
           "rezclaw_skills/"
         ],
-        "roles_note": "ec_manager_china：中国电商直通车分析口径与模板；marketing：本地营销线索收集与跟进（小红书等平台）。见 rezclaw_skills/ec_manager_china/skills.md 与 rezclaw_skills/marketing/skills.md"
+        "roles_note": "ec_manager_china：淘宝电商数据收集与分析（投放+店铺经营）；marketing：本地营销线索收集与跟进（小红书等平台）。见 rezclaw_skills/*/SKILL.md"
       }
     }
   ],
