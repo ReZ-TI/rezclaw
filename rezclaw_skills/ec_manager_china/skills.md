@@ -202,42 +202,43 @@
 
 ## 13. 浏览器自动化场景（OpenClaw 定时任务）
 
-当系统完成以下配置后，AI 助手可实现全自动数据抓取与录入：
+当系统完成以下配置后，AI 助手可实现全自动数据抓取与录入。
 
-### 13.1 前置条件
+> **注意**：本 Skill 主要针对**阿里妈妈直通车关键词推广**数据。如需**生意参谋店铺整体数据**（访客数、支付金额等），请参考「14. 生意参谋数据日报」。
 
+### 13.1 阿里妈妈直通车自动化（本 Skill 适用）
+
+**数据来源**：阿里妈妈统一工作台 [one.alimama.com](https://one.alimama.com) · 关键词推广
+
+**前置条件**：
 | 配置项 | 说明 |
 |--------|------|
 | Chrome 浏览器 | 启动参数：`--remote-debugging-port=28800` |
-| OpenClaw SSRF 策略 | 允许 `one.alimama.com`、`sycm.taobao.com` |
+| OpenClaw SSRF 策略 | 允许 `one.alimama.com` |
 | 登录态 | 阿里妈妈后台保持登录 |
 
-### 13.2 自动化流程
-
+**自动化流程**：
 ```
-定时任务触发（每天 10:00 AM）
+定时任务触发
     ↓
 启动 Chrome（如未运行）
     ↓
-访问阿里妈妈后台 → 抓取昨日数据
+访问 one.alimama.com → 进入关键词推广
     ↓
-录入企业微信智能表格
+抓取计划/单元/关键词数据（展现、点击、花费、ROI等）
     ↓
-记录执行日志
+按第7章模板输出分析结果
+    ↓
+（可选）录入智能表格
 ```
 
-### 13.3 智能表格录入
-
+**智能表格录入**：
 使用 `wecom_mcp` 工具：
 - `smartsheet_get_sheet` - 获取子表信息
-- `smartsheet_get_fields` - 获取字段结构
+- `smartsheet_get_fields` - 获取字段结构  
 - `smartsheet_add_records` - 添加数据记录
 
-**表格 URL 示例**：
-`https://doc.weixin.qq.com/smartsheet/s3_ASEAnQYSAF4CNrUvCw1tCQPSNs0xy`
-
-### 13.4 配置示例
-
+**配置示例**：
 ```json
 // openclaw.json
 {
@@ -246,13 +247,48 @@
     "ssrfPolicy": {
       "dangerouslyAllowPrivateNetwork": true,
       "allowedHostnames": [
-        "one.alimama.com",
-        "sycm.taobao.com"
+        "one.alimama.com"
       ]
     }
   }
 }
 ```
+
+---
+
+## 14. 生意参谋数据日报（店铺整体数据）
+
+> **注意**：此场景**不属于本 Skill 范围**，但常与直通车分析配合使用，故在此说明。
+
+**数据来源**：淘宝生意参谋 [sycm.taobao.com](https://sycm.taobao.com) · 数据概览
+
+**与本 Skill 的区别**：
+
+| 维度 | 阿里妈妈直通车（本 Skill） | 生意参谋数据日报 |
+|------|------------------------|----------------|
+| **数据范围** | 付费推广数据（关键词推广） | 店铺整体数据（免费+付费） |
+| **核心指标** | 展现、点击、花费、ROI、质量分 | 访客数、支付金额、转化率、客单价 |
+| **后台入口** | one.alimama.com | sycm.taobao.com |
+| **分析粒度** | 计划/单元/关键词 | 店铺/商品/流量来源 |
+
+**生意参谋自动化配置**：
+```json
+// openclaw.json（补充配置）
+{
+  "browser": {
+    "ssrfPolicy": {
+      "allowedHostnames": [
+        "one.alimama.com",    // 直通车
+        "sycm.taobao.com"     // 生意参谋
+      ]
+    }
+  }
+}
+```
+
+**建议**：
+- 直通车深度分析 → 使用本 Skill（ec_manager_china）
+- 店铺整体数据监控 → 单独配置定时任务（参考 ReZClaw 其他 Skill）
 
 ---
 
