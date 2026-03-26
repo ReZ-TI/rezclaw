@@ -2,7 +2,9 @@
 
 **角色 ID**：`ec_manager_china`  
 **适用平台**：阿里妈妈统一工作台 [one.alimama.com](https://one.alimama.com) · **关键词推广**（非全站推等其它产品线的细节以后台为准）  
-**用途**：指导智能体按统一口径解读投放数据、填分析模板、做问题诊断与优化优先级排序；**不替代**人类登录后台拉数，数值须由人类提供或从后台只读核对。
+**用途**：指导智能体按统一口径解读投放数据、填分析模板、做问题诊断与优化优先级排序。
+
+> **注意**：当系统配置完成后（Chrome 浏览器 + SSRF 策略），AI 助手可以自动启动浏览器、访问后台、抓取数据并录入智能表格。详见「13. 浏览器自动化场景」。
 
 ---
 
@@ -195,6 +197,62 @@
 - **不虚构** 花费、成交、ROI、质量分等；用户未给数据时输出**模板 + 待填项**，并说明需从后台复制或导出。
 - **不泄露** 用户粘贴的账户 ID、内部商品 ID；不在无关会话中复述。
 - 平台功能名、菜单位置随阿里妈妈改版可能变化；遇阻时建议用户以**当前后台界面**为准并更新本 Skill 的人类维护版。
+
+---
+
+## 13. 浏览器自动化场景（OpenClaw 定时任务）
+
+当系统完成以下配置后，AI 助手可实现全自动数据抓取与录入：
+
+### 13.1 前置条件
+
+| 配置项 | 说明 |
+|--------|------|
+| Chrome 浏览器 | 启动参数：`--remote-debugging-port=28800` |
+| OpenClaw SSRF 策略 | 允许 `one.alimama.com`、`sycm.taobao.com` |
+| 登录态 | 阿里妈妈后台保持登录 |
+
+### 13.2 自动化流程
+
+```
+定时任务触发（每天 10:00 AM）
+    ↓
+启动 Chrome（如未运行）
+    ↓
+访问阿里妈妈后台 → 抓取昨日数据
+    ↓
+录入企业微信智能表格
+    ↓
+记录执行日志
+```
+
+### 13.3 智能表格录入
+
+使用 `wecom_mcp` 工具：
+- `smartsheet_get_sheet` - 获取子表信息
+- `smartsheet_get_fields` - 获取字段结构
+- `smartsheet_add_records` - 添加数据记录
+
+**表格 URL 示例**：
+`https://doc.weixin.qq.com/smartsheet/s3_ASEAnQYSAF4CNrUvCw1tCQPSNs0xy`
+
+### 13.4 配置示例
+
+```json
+// openclaw.json
+{
+  "browser": {
+    "enabled": true,
+    "ssrfPolicy": {
+      "dangerouslyAllowPrivateNetwork": true,
+      "allowedHostnames": [
+        "one.alimama.com",
+        "sycm.taobao.com"
+      ]
+    }
+  }
+}
+```
 
 ---
 
