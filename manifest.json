@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 26,
-  "updated_at": "2026-04-09T06:15:00Z",
-  "changelog": "dify-integration：新增「龙虾易错」小节（streaming / curl -N / 超时）；README 与 home-assistant-primer 同步提示，避免 blocking 与短超时误判。",
+  "content_revision": 27,
+  "updated_at": "2026-04-09T07:00:00Z",
+  "changelog": "新增 rezclaw_skills/rfq_trade_specialist：国际贸易专员 RFQ 商机检查（Alibaba 登录校验、RFQ 抓取30条、企业微信智能表格写入与近14天去重）。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
@@ -54,9 +54,10 @@
           "rezclaw_skills/README.md",
           "rezclaw_skills/ec_manager_china/SKILL.md",
           "rezclaw_skills/marketing/SKILL.md",
+          "rezclaw_skills/rfq_trade_specialist/SKILL.md",
           "rezclaw_skills/"
         ],
-        "roles_note": "ec_manager_china：淘宝电商数据收集与分析（投放+店铺经营）；marketing：本地营销线索收集与跟进（小红书等平台）。见 rezclaw_skills/*/SKILL.md"
+        "roles_note": "ec_manager_china：淘宝电商数据收集与分析（投放+店铺经营）；marketing：本地营销线索收集与跟进（小红书等平台）；rfq_trade_specialist：国际贸易专员 RFQ 商机检查（Alibaba 抓取 + 企业微信智能表格）。见 rezclaw_skills/*/SKILL.md"
       }
     }
   ],
