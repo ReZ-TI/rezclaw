@@ -80,7 +80,7 @@
 |------|----------|----------------|
 | **雷泽智能公开知识库** | 本 README / `manifest` 说明；库内资料含**产品使用说明书、企业手册、产品手册、价格**等；Dify 站点 [dify.rez-ti.com](https://dify.rez-ti.com) | **`POST https://dify.rez-ti.com/v1/chat-messages`**（或环境所配 `DIFY_API_BASE`）；**简短 `query`** → 检索结果；Key 向工作人员获取 |
 | HA 使用知识库 | **优先** [`docs/home-assistant-primer.md`](./docs/home-assistant-primer.md)；其次 Obsidian 目录（见 `manifest.json` `ha_kb`） | 产品类自然语言同上 Dify API；**HA 设备控制**用用户环境的 REST + Token |
-| rezclaw_skills | 本仓库 `rezclaw_skills/` | — |
+| rezclaw_skills | 本仓库 `rezclaw_skills/`（含 `rfq_trade_specialist`：Alibaba RFQ 按 20 条标准执行） | — |
 | 未来扩展 | 在 `manifest.json` 的 `modules` 中登记 | 按需登记 `dify` 条目 |
 
 ---
