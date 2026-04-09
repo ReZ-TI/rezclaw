@@ -75,6 +75,32 @@
 
 响应类型为 **SSE**（`text/event-stream`），需按事件流逐条解析，常见关注事件包括 `message`、`workflow_finished` 等，并在结束后汇总最终 `answer` 与 metadata（实现细节以官方文档为准）。
 
+### 龙虾易错：用 curl / HTTP 自检 `chat-messages` 时
+
+雷泽当前工作流型对话在 HTTP 层返回 **SSE**（`Content-Type: text/event-stream`）。下列写法容易造成**误报失败**（例如以为接口坏了、或 `curl` 退出码非 0），请避免：
+
+| 误操作 | 常见现象 | 正确做法 |
+|--------|----------|----------|
+| 请求体使用 `response_mode: "blocking"`，或以为只有 blocking 才会「一次返回」 | 服务端仍按 **SSE** 推送；若整体等待时间很短，往往只看到 `event: ping` 等心跳 | **一律使用 `response_mode: "streaming"`**，并按 SSE 解析 `data:` 行中的 JSON（关注 `message`、`workflow_finished` 等） |
+| `curl` 使用 `--max-time 10` 等过短上限 | `curl: (28) Operation timed out`，且已收字节数很少 | 流式须等工作流与检索跑完，自检建议 **`-m 120`** 或更长，复杂场景再放宽 |
+| 未使用 **`curl -N`**（`--no-buffer`） | SSE 被缓冲，调试时长时间看不到事件或顺序反常 | **自检与脚本中务必加 `-N`**，使事件及时输出 |
+| 以「短请求」心态验收：HTTP 已是 200，但进程因读不完流而超时 | 误判为网关或应用故障 | 以是否收到 **`workflow_finished`**（或等价结束事件）及完整 **`answer`** 为准；不要仅凭首包或心跳判断成功 |
+
+**macOS / Linux bash 自检示例**（`DIFY_APP_API_KEY` 仅来自人类配置的环境变量或密钥管理，**勿**写入仓库、Issue、聊天；`DIFY_API_BASE` 含路径 `/v1`，内网部署时可为 `http://192.168.x.x/v1`）：
+
+```bash
+export DIFY_APP_API_KEY='由运行环境注入，勿硬编码'
+export DIFY_API_BASE='https://dify.rez-ti.com/v1'
+
+curl -sS -m 120 -N --http1.1 \
+  -X POST "${DIFY_API_BASE}/chat-messages" \
+  -H "Authorization: Bearer ${DIFY_APP_API_KEY}" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{"query":"介绍一下雷泽智能","user":"smoke-test-001","response_mode":"streaming","inputs":{}}'
+```
+
+若 **`streaming` + 足够 `-m` + `-N`** 下仍长时间只有 `ping`、没有带业务负载的 `data:` 行，多为**工作流、模型或上游服务卡住或超时**，应在 Dify 控制台查看运行日志，**不要**改回 `blocking` 作为解决办法。
+
 ### 说明：不提供知识库直连接口
 
 雷泽**不再对外提供** Dify「知识库 / 数据集」类的直接 HTTP 查询（例如列举数据集、按 dataset 调检索 API 等）。集成方与龙虾**只应**使用本节的 **`POST /chat-messages`**，由已发布的对话应用在服务端完成知识检索与编排。
@@ -146,9 +172,10 @@ Invoke-RestMethod -Uri $uri -Method Post `
 
 ## 调用失败时：新龙虾该怎么做
 
-1. **打开上文保留的官方链接**（尤其 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)），对照当前 Dify 版本的 OpenAPI（路径、参数、鉴权头是否变更）。  
-2. **检索** [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt) 中与「对话 / Chat / 工作流」相关的最新页面。  
-3. 若官方文档与本文档**明显不一致**或雷泽环境有特殊网关前缀，请到 **[ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)** 提交 **Issue**，说明：期望行为、请求方法路径、HTTP 状态码与脱敏后的错误信息（**勿贴 API Key**），便于人类更新 `dify-integration.md` 或 `manifest`。
+1. 若 **HTTP 200**、响应头为 **`text/event-stream`**，但 **`curl` 超时**或几乎只收到 **`event: ping`**：先对照上文 **「龙虾易错：用 curl / HTTP 自检 `chat-messages` 时」**，确认已使用 **`streaming`**、**`-N`**、**足够长的 `-m`**，勿将此类现象误判为「blocking 未生效」或接口地址错误。  
+2. **打开上文保留的官方链接**（尤其 [Send Chat Message](https://docs.dify.ai/api-reference/chat/send-chat-message)），对照当前 Dify 版本的 OpenAPI（路径、参数、鉴权头是否变更）。  
+3. **检索** [https://docs.dify.ai/llms.txt](https://docs.dify.ai/llms.txt) 中与「对话 / Chat / 工作流」相关的最新页面。  
+4. 若官方文档与本文档**明显不一致**或雷泽环境有特殊网关前缀，请到 **[ReZ-TI/rezclaw](https://github.com/ReZ-TI/rezclaw)** 提交 **Issue**，说明：期望行为、请求方法路径、HTTP 状态码与脱敏后的错误信息（**勿贴 API Key**），便于人类更新 `dify-integration.md` 或 `manifest`。
 
 ---
 

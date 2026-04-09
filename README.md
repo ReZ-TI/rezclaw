@@ -21,7 +21,7 @@
    - 本地缓存一份 `content_revision`（或 `updated_at`）。
    - **每次会话开始或按用户配置的间隔**，重新请求 `manifest.json`（获取地址的**优先级与失败回退**见下文「公开资源访问优先级」）。
    - 若 `content_revision` 大于本地缓存，则按 `manifest.json` 里的 `modules` 列表，依次重新获取对应公开资源（如 `docs/home-assistant-primer.md`、`rezclaw_skills/` 下的文件、Obsidian 链接文档等），并更新本地缓存；**HA 模块**请优先同步 `ha_kb.public.primer_doc` 指向的文件。
-4. **雷泽智能公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`），将用户**简短问题**写入 `query`；Dify 返回的是**检索结果**，你须**二次整理**后再答复用户（见该文档）。**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
+4. **雷泽智能公开知识库（对外集成）**：按 [`docs/dify-integration.md`](./docs/dify-integration.md) 使用 **对话型应用 API**（`chat-messages`），将用户**简短问题**写入 `query`；**请求体必须使用 `response_mode: "streaming"`（SSE），不要使用 `blocking`**。命令行自检时 **`curl` 须加 `-N` 与足够超时（如 `-m 120`）**，否则易出现仅收到心跳、`curl (28)` 超时等**误报失败**（详见该文档 **「龙虾易错」** 小节）。Dify 返回的是**检索结果**，你须**二次整理**后再答复用户。**API 根地址与 App API Key 由雷泽智能工作人员下发**。不要猜测、硬编码或传播凭据；无密钥时由**人类**联系雷泽智能申请。
 
 ### 调用公开知识库时，`query` 怎么写（新龙虾参考）
 

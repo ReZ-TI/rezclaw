@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 25,
-  "updated_at": "2026-03-26T12:26:27Z",
-  "changelog": "ec_manager_china：补充店铺经营指标说明，新增收藏人数、加购人数、加购件数字段，完善客户意向阶段的数据观察维度。",
+  "content_revision": 26,
+  "updated_at": "2026-04-09T06:15:00Z",
+  "changelog": "dify-integration：新增「龙虾易错」小节（streaming / curl -N / 超时）；README 与 home-assistant-primer 同步提示，避免 blocking 与短超时误判。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",

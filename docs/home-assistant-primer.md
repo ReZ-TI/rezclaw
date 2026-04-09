@@ -131,7 +131,7 @@ curl -X POST "${HA_URL}/api/services/calendar/create_event" \
 
 - **HA 概念、REST 习惯、易错点**：以**本文**为准优先同步。  
 - **雷泽内部 HA 深度文章、场景拆解**：见 [Obsidian 目录](https://publish.obsidian.md/rez-ti/HomeAssistant%E4%BC%98%E5%8C%96/0%E7%9B%AE%E5%BD%95%EF%BC%9AHomeAssistant%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E5%88%86%E4%BA%AB)。  
-- **产品手册类自然语言问答**：仍可通过 [`dify-integration.md`](./dify-integration.md) 的 **chat-messages** 检索（与 HA **控制 API** 是两条能力，勿混淆）。
+- **产品手册类自然语言问答**：仍可通过 [`dify-integration.md`](./dify-integration.md) 的 **chat-messages** 检索（与 HA **控制 API** 是两条能力，勿混淆）。调用须 **`response_mode: streaming`**；用 `curl` 自检时勿用过短超时，详见该文档 **「龙虾易错」** 小节。
 
 ---
 
