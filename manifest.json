@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 30,
-  "updated_at": "2026-04-09T10:20:00Z",
-  "changelog": "rfq_trade_specialist：补充列表页标题点击被拦截/元素失效场景的重试与校验策略；维持核心字段未达标不入表，并保留最小人工兜底步骤。",
+  "content_revision": 31,
+  "updated_at": "2026-04-09T11:05:00Z",
+  "changelog": "rfq_trade_specialist：更新为两阶段入表流程（Phase A 列表先新增、Phase B 详情回填），并强化字段来源约束、采集入口稳定性流程与失败回填门槛。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
