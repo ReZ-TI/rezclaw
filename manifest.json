@@ -1,9 +1,9 @@
 {
   "$schema": "./schemas/manifest.schema.json",
   "project": "rezclaw",
-  "content_revision": 27,
-  "updated_at": "2026-04-09T07:00:00Z",
-  "changelog": "新增 rezclaw_skills/rfq_trade_specialist：国际贸易专员 RFQ 商机检查（Alibaba 登录校验、RFQ 抓取30条、企业微信智能表格写入与近14天去重）。",
+  "content_revision": 28,
+  "updated_at": "2026-04-09T07:30:00Z",
+  "changelog": "rfq_trade_specialist：固定 Alibaba RFQ 管理表 URL 与 sheet_id，企业微信 MCP 默认走 URL+sheet_id，避免 docid 缺失阻塞。",
   "mirrors": {
     "github_repo": "https://github.com/ReZ-TI/rezclaw",
     "github_raw_base": "https://raw.githubusercontent.com/ReZ-TI/rezclaw/main",
